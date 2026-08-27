@@ -8,6 +8,14 @@ export type LeadtimeGap = {
   gap: number | null;
 };
 
+export type StockoutRisk = {
+  itemId: string; itemName: string; supplier: string;
+  currentStock: number | null; inboundQty: number | null; availableQty: number | null;
+  dailyUsageAvg: number | null; plannedLeadTime: number | null; stockoutDays: number | null;
+  stockoutDate: string | null; riskStatus: 'SAFE' | 'CRITICAL' | 'UNKNOWN';
+  reason: 'NO_USAGE' | 'NO_LEADTIME' | null;
+};
+
 function value(row: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
@@ -31,5 +39,32 @@ export function normalizeLeadtimeGap(row: Record<string, unknown>): LeadtimeGap 
     actualAverage: numberValue(row, ['mean_days', 'actual_avg', 'actual_average', 'avg_lead_time', '실적평균']),
     p80: numberValue(row, ['p80_days', 'p80', 'P80']),
     gap: numberValue(row, ['gap_days', 'gap', 'leadtime_gap', '격차']),
+  };
+}
+
+export function normalizeStockoutRisk(row: Record<string, unknown>): StockoutRisk {
+  const value = (keys: string[]) => keys.map((key) => row[key]).find((item) => item !== undefined && item !== null && item !== '') ?? null;
+  const numberValue = (keys: string[]) => {
+    const raw = value(keys);
+    if (raw === null) return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+  const riskStatus = String(value(['risk_status', 'status', '위험상태']) ?? 'UNKNOWN').toUpperCase();
+  const reason = value(['reason', 'reason_code', '사유코드']);
+  const stockoutDate = value(['stockout_date', '소진예상일', '소진예정일']);
+  return {
+    itemId: String(value(['item_id', 'item_code', '품목코드']) ?? '미정'),
+    itemName: String(value(['item_name', '품목명']) ?? '미정'),
+    supplier: String(value(['supplier_name', 'supplier', '법인', '공급처']) ?? '미정'),
+    currentStock: numberValue(['current_stock', 'stock_on_hand', '현재고']),
+    inboundQty: numberValue(['inbound_qty', 'inbound', '입고예정']),
+    availableQty: numberValue(['available_qty', 'available', '가용수량']),
+    dailyUsageAvg: numberValue(['daily_usage_avg', 'daily_avg', '일평균사용량']),
+    plannedLeadTime: numberValue(['planned_lead_time', 'lead_time', '계획리드타임']),
+    stockoutDays: numberValue(['stockout_days', '소진일수', '소진예상일수']),
+    stockoutDate: stockoutDate === null ? null : String(stockoutDate),
+    riskStatus: riskStatus === 'SAFE' || riskStatus === 'CRITICAL' ? riskStatus : 'UNKNOWN',
+    reason: reason === 'NO_USAGE' || reason === 'NO_LEADTIME' ? reason : null,
   };
 }
