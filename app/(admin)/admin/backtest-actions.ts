@@ -1,0 +1,7 @@
+'use server';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/auth';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+export async function runBacktest(formData:FormData){ await requireAdmin(); const forecastRunId=String(formData.get('forecast_run_id')??''); if(!forecastRunId) redirect('/analysis/model-comparison?error=FORECAST_RUN_REQUIRED'); const s=await createSupabaseServerClient(); const {data,error}=await s.schema('core').rpc('run_backtest',{p_forecast_run_id:forecastRunId}); if(error) redirect('/analysis/model-comparison?error='+encodeURIComponent(error.message)); revalidatePath('/analysis/model-comparison'); const result=Array.isArray(data)?data[0]:data; redirect('/analysis/model-comparison?backtest_run_id='+(result?.backtest_run_id??'')); }
+export async function setManualChampion(formData:FormData){ await requireAdmin(); const itemId=String(formData.get('item_id')??''); const modelId=String(formData.get('model_id')??''); const reason=String(formData.get('reason')??''); const s=await createSupabaseServerClient(); const {error}=await s.schema('core').rpc('set_manual_champion',{p_item_id:itemId,p_model_id:modelId,p_reason:reason}); if(error) redirect('/analysis/model-comparison?error='+encodeURIComponent(error.message)); revalidatePath('/analysis/model-comparison'); redirect('/analysis/model-comparison?updated=1'); }
