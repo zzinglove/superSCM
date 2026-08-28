@@ -1,0 +1,11 @@
+export const IMPORT_TYPES = ['usage_history','inventory','item_master','supplier_master','purchase_order','goods_receipt','sales_order','business_event'] as const;
+export type ImportType = typeof IMPORT_TYPES[number];
+export type ImportMode = 'append' | 'upsert' | 'replace';
+export type Severity = 'WARNING' | 'ERROR';
+export type RowStatus = 'SUCCESS' | 'WARNING' | 'ERROR';
+export type ImportRow = Record<string, unknown>;
+export type ColumnMapping = { source: string; target: string; confidence: number };
+export type ValidationError = { code: string; message: string; severity: Severity; field?: string; originalValue?: unknown };
+export type ValidatedRow = { rowNumber: number; original: ImportRow; mapped: ImportRow; status: RowStatus; errors: ValidationError[] };
+export type ValidationOptions = { items?: Set<string>; suppliers?: Set<string>; existingKeys?: Set<string> };
+export type ValidationResult = { status: RowStatus; rows: ValidatedRow[]; errors: (ValidationError & { rowNumber: number })[]; counts: { success: number; warning: number; error: number } };

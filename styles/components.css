@@ -117,8 +117,30 @@
 .data-table-scroll { border: 1px solid var(--color-border); border-radius: 11px; }
 .ui-data-table th, .ui-data-table td { padding: 12px 14px; }
 .badge, .tag { border-radius: 999px; }
- (max-width: 760px) { .content, .analysis-page { padding: 24px 16px 40px; } }
+@media (max-width: 760px) { .content, .analysis-page { padding: 24px 16px 40px; } }
 
 .auth-card .form-stack { display: grid; gap: 12px; margin-top: 20px; text-align: left; }
 .auth-card .form-stack label { display: grid; gap: 6px; color: var(--color-muted); font-size: 12px; font-weight: 700; }
 .auth-card .form-stack .ui-button { width: 100%; justify-content: center; }
+
+.topbar h1 { margin: 5px 0 0; font-size: 18px; letter-spacing: -0.5px; }
+.topbar .eyebrow { color: var(--color-primary); text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: 1.2px; }
+.top-meta form { display: flex; margin: 0; }
+
+/* 레거시 Workflow 단계형 상단 복원 */
+.progress-wrap { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; padding: 19px 22px 15px; margin-bottom: 26px; }
+.progress-track { display: flex; align-items: flex-start; gap: 0; }
+.progress-step { position: relative; min-width: 112px; padding: 0; border: 0; background: transparent; color: var(--color-muted); display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 7px; white-space: nowrap; }
+.progress-step.active, .progress-step.done { color: var(--color-primary-strong); font-weight: 700; }
+.progress-kicker { min-height: 15px; color: var(--color-muted); font-size: 9px; font-weight: 800; letter-spacing: .8px; }
+.progress-step.active .progress-kicker { color: var(--color-primary); }
+.progress-step.done .progress-kicker { color: var(--color-primary-strong); }
+.progress-dot { position: relative; z-index: 2; width: 27px; height: 27px; border-radius: 50%; border: 3px solid var(--color-border); display: grid; place-items: center; background: var(--color-surface); color: var(--color-muted); font-size: 10px; font-weight: 800; box-shadow: 0 0 0 5px var(--color-surface); }
+.progress-step.active .progress-dot { width: 31px; height: 31px; color: var(--color-primary); border-color: var(--color-primary); box-shadow: 0 0 0 5px var(--color-surface), 0 0 0 7px rgb(0 162 115 / 9%); }
+.progress-step.done .progress-dot { color: var(--color-surface); background: var(--color-primary); border-color: var(--color-primary); }
+.progress-label { font-size: 11px; color: var(--color-muted); }
+.progress-step.active .progress-label, .progress-step.done .progress-label { color: var(--color-primary-strong); }
+.progress-line { flex: 1; min-width: 30px; height: 3px; margin: 39px 0 0; background: var(--color-border); border-radius: 999px; }
+.progress-step.done + .progress-line { background: var(--color-primary); }
+.progress-caption { display: flex; justify-content: space-between; margin-top: 12px; color: var(--color-muted); font-size: 11px; }
+@media (max-width: 760px) { .progress-wrap { overflow-x: auto; } .progress-track { min-width: 700px; } }

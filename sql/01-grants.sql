@@ -22,3 +22,6 @@ select has_schema_privilege('anon', 'analytics', 'usage')            as anon_sch
 
 -- 분석 화면에 필요한 뷰만 authenticated 읽기를 허용합니다.
 grant select on analytics.v_leadtime_gap, analytics.v_stockout_kpi, analytics.v_stockout_risk to authenticated;
+grant select on core.v_train_demand, core.v_test_actual to authenticated;
+grant select on analytics.v_data_coverage to authenticated;
+grant select on core.policy_config, core.outlier_rule, core.item_policy, core.forecast_setting to authenticated;
