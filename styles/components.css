@@ -118,3 +118,7 @@
 .ui-data-table th, .ui-data-table td { padding: 12px 14px; }
 .badge, .tag { border-radius: 999px; }
  (max-width: 760px) { .content, .analysis-page { padding: 24px 16px 40px; } }
+
+.auth-card .form-stack { display: grid; gap: 12px; margin-top: 20px; text-align: left; }
+.auth-card .form-stack label { display: grid; gap: 6px; color: var(--color-muted); font-size: 12px; font-weight: 700; }
+.auth-card .form-stack .ui-button { width: 100%; justify-content: center; }

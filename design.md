@@ -362,3 +362,12 @@ UNKNOWN  → 판정 불가 배지 + 사유
 - 계산 불가 값은 숫자 0으로 대체하지 않고 — + reason_code 형식으로 표시한다.
 - Lead Time과 Stockout 화면은 동일한 기존 레이아웃을 공유하되, 데이터 조회·계산 로직은 변경하지 않는다.
 - 신규 URL(/user/dashboard, /user/analysis/leadtime, /user/analysis/stockout)에서도 기존 화면과 같은 시각적 계층을 유지한다.
+
+## 9. STEP 2 인증·RBAC 요구사항
+
+- Supabase Auth 세션은 SSR cookie client와 middleware로 유지한다.
+- 보호 경로는 /user/*, /admin/*, /workflow이며 미인증 요청은 /login?next=...로 이동한다.
+- core.app_user의 role과 active가 권한의 기준이며, 메뉴 숨김은 보안 수단이 아니다.
+- ADMIN 사용자 변경은 /admin/users의 Server Action과 PostgreSQL RLS를 모두 통과해야 한다.
+- role 또는 active 변경은 core.audit_log에 actor, action, target, before, after, at을 기록한다.
+- 본인 계정의 관리자 권한 제거와 비활성화는 서버와 DB에서 모두 거부한다.
