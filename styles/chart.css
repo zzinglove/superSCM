@@ -1,0 +1,6 @@
+.chart-panel { min-height: 280px; }
+.chart-bar { background: var(--color-primary); border-radius: 2px 2px 0 0; }
+.chart-bar.warning { background: var(--color-warning); }
+.chart-bar.critical { background: var(--color-critical); }
+.chart-axis { color: var(--color-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.hatch-pattern { background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgb(0 0 0 / 7%) 8px, rgb(0 0 0 / 7%) 16px); }
