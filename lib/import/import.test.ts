@@ -34,6 +34,7 @@ test('serializes only error and warning rows with original values', () => {
   const csv = toErrorCsv([{
     rowNumber: 2,
     original: { 품목코드: 'NOPE', 출고수량: 'x' },
+    mapped: {},
     errors: [{ code: 'UNKNOWN_ITEM', message: '품목이 없습니다.', severity: 'ERROR', field: 'item_id', originalValue: 'NOPE' }],
     status: 'ERROR',
   }]);

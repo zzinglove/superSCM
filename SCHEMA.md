@@ -54,27 +54,39 @@
 | confidence | text | HIGH / MEDIUM / LOW (표본 수 기준) |
 
 ### `v_stockout_risk`
-재고 소진 위험. 20행. **오후 실습의 검증 정답지입니다.**
+Forecast 기반 Inventory Projection에서 집계한 재고 소진 위험. **오후 실습의 검증 정답지입니다.**
 
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | item_id | text | ITEM001 ~ ITEM020 |
 | item_name | text | 품목명 |
 | supplier_id | text | 생산법인 |
-| current_stock | numeric | 현재고 (창고 합산) |
-| inbound_qty | numeric | 입고예정 (진행 중 선적) |
-| available_qty | numeric | current_stock + inbound_qty |
-| daily_usage_avg | numeric | 일평균 사용량 (없으면 null) |
-| cv | numeric | 변동계수 |
+| current_stock | numeric | 현재고 (창고 합산, 없으면 null) |
+| inbound_qty | numeric | Projection horizon 내 입고예정 합계 |
 | planned_lead_time | int | 적용 중인 계획 리드타임 |
-| stockout_days | numeric | available_qty ÷ daily_usage_avg (계산 불가 시 null) |
-| stockout_date | date | 소진 예상일 |
-| risk_status | text | SAFE / CRITICAL / UNKNOWN |
-| reason | text | NO_USAGE / NO_LEADTIME (정상이면 null) |
+| days_of_supply / months_of_supply | numeric | Forecast Projection 기준 공급 가능 기간 (계산 불가 시 null) |
+| stockout_date / stockout_period | date | 최초 ending projected inventory <= 0인 기간 |
+| risk_status | text | SAFE / WARNING / CRITICAL / CALCULATION_UNAVAILABLE |
+| reason_code | text | NO_USAGE_HISTORY / NO_LEADTIME / NO_INVENTORY_DATA / INSUFFICIENT_SAMPLE / NO_FORECAST |
+
+### `v_inventory_projection`
+품목·월별 Projection. `beginning_inventory + scheduled_receipt - confirmed_sales_order - soft_allocation - forecast_demand`로 계산하며, forecast_demand는 Champion p50에서 확정수주를 뺀 잔여 수요다.
+
+`item_id`, `item_name`, `supplier_id`, `period`, `beginning_inventory`, `scheduled_receipt`, `confirmed_sales_order`, `soft_allocation`, `soft_allocation_state`, `forecast_demand`, `ending_projected_inventory`, `stockout_date`, `stockout_period`, `days_of_supply`, `months_of_supply`, `effective_lead_time`, `leadtime_source`, `calculation_status`, `risk_status`, `reason_code`
 
 ### `v_stockout_kpi`
 요약 한 줄.
-`n_items`, `n_critical`, `n_safe`, `n_unknown`, `n_within_30d`, `avg_stockout_days`
+`n_items`, `n_critical`, `n_warning`, `n_safe`, `n_calculation_unavailable`, `n_within_30d`, `avg_stockout_days`
+
+### `v_safety_stock`
+Forecast Error sigma, Lead Time variability, Service Level 정책을 결합한 Safety Stock 결과.
+
+`item_id`, `item_grade`, `leadtime_days`, `demand_daily`, `forecast_error_sigma`, `leadtime_sigma`, `service_level`, `z_value`, `sigma_dlt`, `safety_stock`, `calculation_status`, `reason_code`, `forecast_run_id`, `model_version`
+
+### `v_purchase_recommendation`
+Forecast·확정수주·STEP 9 Projection·Safety Stock·Item Policy를 결합한 최종 발주추천 결과.
+
+`item_id`, `item_name`, `item_grade`, `forecast_qty`, `confirmed_order_qty`, `demand_basis_qty`, `available_inventory`, `scheduled_receipt`, `safety_stock`, `effective_leadtime`, `stockout_date`, `safety_buffer_days`, `required_qty`, `moq`, `pack_size`, `recommended_qty`, `recommended_order_date`, `risk_status`, `calculation_status`, `reason_code`, `forecast_run_id`, `model_version`, `is_immediate`, `is_overdue`, `order_timing_status`, `calculation_trace`
 
 ### `v_usage_profile`
 자재별 사용 프로파일. 19행.
@@ -99,6 +111,10 @@
 ### `usage_profile` (테이블 · 쓰기 가능)
 오전 분석에서 확정한 일평균 사용량.
 `item_id`(PK), `valid_days`, `daily_usage_avg`, `daily_usage_sd`, `cv`, `confirmed_at`
+
+### `safety_stock_policy` (테이블 · ADMIN 쓰기 가능)
+등급별 Service Level과 Z Value 정책.
+`item_grade`(PK), `service_level`, `z_value`, `active`, `updated_at`, `updated_by`
 
 ### 그 밖의 core 뷰
 
